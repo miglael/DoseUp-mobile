@@ -1,4 +1,5 @@
 import 'package:doseup_project/features/auth/providers/auth_providers.dart';
+import 'package:doseup_project/features/auth/screens/patient_dashboard_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -52,7 +53,15 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    _showLoginSuccess(authProvider.currentUser!);
+    final user = authProvider.currentUser!;
+
+    if (user.role == UserRole.patient) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const PatientDashboardScreen()),
+      );
+    } else {
+      _showMessageForGuardian();
+    }
   }
 
   void _showLoginSuccess(UserModel user) {
@@ -82,6 +91,16 @@ class _LoginScreenState extends State<LoginScreen> {
           ],
         );
       },
+    );
+  }
+
+  void _showMessageForGuardian() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          'Dashboard Pendamping akan dibuat pada tahap berikutnya.',
+        ),
+      ),
     );
   }
 
