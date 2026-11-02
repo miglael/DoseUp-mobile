@@ -1,5 +1,6 @@
 import 'package:doseup_project/features/auth/providers/auth_providers.dart';
-import 'package:doseup_project/features/auth/screens/patient_dashboard_screen.dart';
+//import 'package:doseup_project/features/patient/screens/patient_dashboard_screen.dart';
+import 'package:doseup_project/features/patient/screens/patient_dashboard_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
