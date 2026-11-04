@@ -1,4 +1,4 @@
-import 'package:doseup_project/features/auth/providers/medication_provider.dart';
+import 'package:doseup_project/features/patient/providers/medication_provider.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_theme.dart';

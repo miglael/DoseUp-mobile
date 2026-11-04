@@ -1,5 +1,5 @@
 import 'package:doseup_project/features/auth/providers/auth_providers.dart';
-import 'package:doseup_project/features/auth/providers/medication_provider.dart';
+import 'package:doseup_project/features/patient/providers/medication_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

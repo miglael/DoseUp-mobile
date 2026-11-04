@@ -6,6 +6,8 @@ class MedicationScheduleModel {
   final String dosage;
   final String time;
   final String instruction;
+  final int weekday;
+
   MedicationStatus status;
 
   MedicationScheduleModel({
@@ -14,6 +16,7 @@ class MedicationScheduleModel {
     required this.dosage,
     required this.time,
     required this.instruction,
+    this.weekday = 3,
     required this.status,
   });
 }

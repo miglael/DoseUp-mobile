@@ -1,4 +1,5 @@
-import 'package:doseup_project/features/auth/providers/medication_provider.dart';
+import 'package:doseup_project/features/patient/providers/medication_provider.dart';
+import 'package:doseup_project/features/patient/screens/medication_schedule_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -35,8 +36,13 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
       return;
     }
 
-    // Halaman lain belum diimplementasikan.
-    // Tetap tandai Beranda sebagai tab aktif.
+    if (index == 1) {
+      Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => const MedicationScheduleScreen()),
+      );
+      return;
+    }
+
     _showMessage(
       'Halaman ${['Beranda', 'Jadwal', 'Riwayat', 'Profil'][index]} '
       'akan dibuat pada tahap berikutnya.',
