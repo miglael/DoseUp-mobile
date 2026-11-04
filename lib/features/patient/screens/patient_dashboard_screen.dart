@@ -20,33 +20,12 @@ class PatientDashboardScreen extends StatefulWidget {
 }
 
 class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
-  int _selectedTab = 0;
-
   void _showMessage(String message) {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(
         SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
       );
-  }
-
-  void _handleNavigation(int index) {
-    if (index == 0) {
-      setState(() => _selectedTab = 0);
-      return;
-    }
-
-    if (index == 1) {
-      Navigator.of(context).push(
-        MaterialPageRoute(builder: (_) => const MedicationScheduleScreen()),
-      );
-      return;
-    }
-
-    _showMessage(
-      'Halaman ${['Beranda', 'Jadwal', 'Riwayat', 'Profil'][index]} '
-      'akan dibuat pada tahap berikutnya.',
-    );
   }
 
   @override
@@ -137,11 +116,6 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
             ],
           ),
         ),
-      ),
-
-      bottomNavigationBar: AppBottomNavbar(
-        selectedIndex: _selectedTab,
-        onTap: _handleNavigation,
       ),
     );
   }

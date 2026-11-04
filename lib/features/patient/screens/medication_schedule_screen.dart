@@ -122,17 +122,6 @@ class _MedicationScheduleScreenState extends State<MedicationScheduleScreen> {
         shape: const CircleBorder(),
         child: const Icon(Icons.add, size: 38),
       ),
-
-      bottomNavigationBar: AppBottomNavbar(
-        selectedIndex: 1,
-        onTap: (index) {
-          if (index == 0) {
-            Navigator.of(context).pop();
-          } else if (index != 1) {
-            _showMessage('Halaman navigasi tersebut akan dibuat berikutnya.');
-          }
-        },
-      ),
     );
   }
 

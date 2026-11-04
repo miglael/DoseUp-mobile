@@ -1,6 +1,7 @@
 import 'package:doseup_project/features/auth/providers/auth_providers.dart';
 //import 'package:doseup_project/features/patient/screens/patient_dashboard_screen.dart';
 import 'package:doseup_project/features/patient/screens/patient_dashboard_screen.dart';
+import 'package:doseup_project/features/patient/screens/patient_shell_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -58,7 +59,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (user.role == UserRole.patient) {
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const PatientDashboardScreen()),
+        MaterialPageRoute(builder: (_) => const PatientShellScreen()),
       );
     } else {
       _showMessageForGuardian();
