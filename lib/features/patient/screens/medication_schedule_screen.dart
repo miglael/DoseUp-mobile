@@ -1,3 +1,4 @@
+import 'package:doseup_project/features/patient/screens/add_medication.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -113,8 +114,16 @@ class _MedicationScheduleScreenState extends State<MedicationScheduleScreen> {
       ),
 
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _showMessage('Fitur tambah jadwal obat akan dibuat berikutnya.');
+        onPressed: () async {
+          final result = await Navigator.of(context).push<bool>(
+            MaterialPageRoute(builder: (_) => const AddMedicationScreen()),
+          );
+
+          if (!context.mounted) return;
+
+          if (result == true) {
+            _showMessage('Obat berhasil ditambahkan.');
+          }
         },
         backgroundColor: AppTheme.primary,
         foregroundColor: Colors.white,

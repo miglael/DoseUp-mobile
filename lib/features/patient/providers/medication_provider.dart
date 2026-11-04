@@ -32,6 +32,43 @@ class MedicationProvider extends ChangeNotifier {
     return null;
   }
 
+  void addMedication({
+    required String name,
+    required String dosage,
+    required int stock,
+    required String time,
+    required String frequency,
+    required DateTime startDate,
+    DateTime? endDate,
+    required String instruction,
+  }) {
+    // Halaman Jadwal saat ini menyediakan pilihan Senin-Jumat.
+    // Untuk frekuensi harian, buat jadwal pada kelima hari tersebut.
+    final weekdays = frequency == 'Harian'
+        ? [1, 2, 3, 4, 5]
+        : [startDate.weekday];
+
+    for (final weekday in weekdays) {
+      _schedules.add(
+        MedicationScheduleModel(
+          id: 'med-${DateTime.now().microsecondsSinceEpoch}-$weekday',
+          name: name,
+          dosage: dosage,
+          stock: stock,
+          time: time,
+          frequency: frequency,
+          startDate: startDate,
+          endDate: endDate,
+          instruction: instruction,
+          weekday: weekday,
+          status: MedicationStatus.upcoming,
+        ),
+      );
+    }
+
+    notifyListeners();
+  }
+
   void markAsTaken(String id) {
     final index = _schedules.indexWhere((item) => item.id == id);
     if (index == -1) return;

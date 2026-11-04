@@ -8,6 +8,11 @@ class MedicationScheduleModel {
   final String instruction;
   final int weekday;
 
+  final int stock;
+  final String frequency;
+  final DateTime? startDate;
+  final DateTime? endDate;
+
   MedicationStatus status;
 
   MedicationScheduleModel({
@@ -17,6 +22,10 @@ class MedicationScheduleModel {
     required this.time,
     required this.instruction,
     this.weekday = 3,
+    this.stock = 0,
+    this.frequency = 'Harian',
+    this.startDate,
+    this.endDate,
     required this.status,
   });
 }
