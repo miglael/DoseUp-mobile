@@ -1,6 +1,5 @@
 import 'package:doseup_project/features/auth/providers/auth_providers.dart';
 //import 'package:doseup_project/features/patient/screens/patient_dashboard_screen.dart';
-import 'package:doseup_project/features/patient/screens/patient_dashboard_screen.dart';
 import 'package:doseup_project/features/patient/screens/patient_shell_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -64,36 +63,6 @@ class _LoginScreenState extends State<LoginScreen> {
     } else {
       _showMessageForGuardian();
     }
-  }
-
-  void _showLoginSuccess(UserModel user) {
-    showDialog<void>(
-      context: context,
-      builder: (dialogContext) {
-        return AlertDialog(
-          icon: const Icon(
-            Icons.check_circle_outline,
-            color: AppTheme.primary,
-            size: 48,
-          ),
-          title: const Text('Login Berhasil'),
-          content: Text(
-            'Selamat datang, ${user.name}!\n\n'
-            'Role: ${user.role == UserRole.patient ? 'Pasien' : 'Pendamping'}\n\n'
-            'Login ini masih menggunakan data demo lokal.',
-            textAlign: TextAlign.center,
-          ),
-          actions: [
-            FilledButton(
-              onPressed: () {
-                Navigator.of(dialogContext).pop();
-              },
-              child: const Text('Mengerti'),
-            ),
-          ],
-        );
-      },
-    );
   }
 
   void _showMessageForGuardian() {

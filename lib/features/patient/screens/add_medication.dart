@@ -14,6 +14,7 @@ class AddMedicationScreen extends StatefulWidget {
 
 class _AddMedicationScreenState extends State<AddMedicationScreen> {
   final _formKey = GlobalKey<FormState>();
+  final List<int> _selectedWeekdays = [];
 
   final _nameController = TextEditingController();
   final _dosageController = TextEditingController();
@@ -125,24 +126,45 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
       return;
     }
 
+    if (_endDate != null && _endDate!.isBefore(_startDate!)) {
+      _showError('Tanggal selesai tidak boleh sebelum tanggal mulai.');
+      return;
+    }
+
+    if (_frequency == 'Mingguan' && _selectedWeekdays.isEmpty) {
+      _showError('Silakan pilih minimal satu hari konsumsi.');
+      return;
+    }
+
     setState(() => _isSaving = true);
 
-    final time = _formatTime(_selectedTime);
+    try {
+      await context.read<MedicationProvider>().addMedication(
+        name: _nameController.text.trim(),
+        dosage: _dosageController.text.trim(),
+        stock: int.parse(_stockController.text.trim()),
+        time: _formatTime(_selectedTime),
+        frequency: _frequency,
+        startDate: _startDate!,
+        endDate: _endDate,
+        instruction: _instruction,
+        selectedWeekdays: _frequency == 'Mingguan'
+            ? List<int>.from(_selectedWeekdays)
+            : [],
+      );
 
-    context.read<MedicationProvider>().addMedication(
-      name: _nameController.text.trim(),
-      dosage: _dosageController.text.trim(),
-      stock: int.parse(_stockController.text.trim()),
-      time: time,
-      frequency: _frequency,
-      startDate: _startDate!,
-      endDate: _endDate,
-      instruction: _instruction,
-    );
+      if (!mounted) return;
 
-    if (!mounted) return;
+      Navigator.of(context).pop(true);
+    } catch (error) {
+      if (!mounted) return;
 
-    Navigator.of(context).pop(true);
+      _showError('Gagal menyimpan obat. Silakan coba kembali.');
+    } finally {
+      if (mounted) {
+        setState(() => _isSaving = false);
+      }
+    }
   }
 
   void _showError(String message) {
@@ -295,6 +317,10 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
             ),
           ],
         ),
+        if (_frequency == 'Mingguan') ...[
+          const SizedBox(height: 20),
+          _buildWeekdaySelector(),
+        ],
 
         const SizedBox(height: 20),
 
@@ -472,6 +498,72 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
             }
           },
         ),
+      ],
+    );
+  }
+
+  Widget _buildWeekdaySelector() {
+    const weekdays = [
+      {'label': 'Sen', 'value': 1},
+      {'label': 'Sel', 'value': 2},
+      {'label': 'Rab', 'value': 3},
+      {'label': 'Kam', 'value': 4},
+      {'label': 'Jum', 'value': 5},
+      {'label': 'Sab', 'value': 6},
+      {'label': 'Min', 'value': 7},
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Pilih Hari Konsumsi',
+          style: TextStyle(
+            fontSize: 17,
+            fontWeight: FontWeight.w600,
+            color: AppTheme.textSecondary,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: weekdays.map((day) {
+            final value = day['value'] as int;
+            final selected = _selectedWeekdays.contains(value);
+
+            return FilterChip(
+              label: Text(day['label'] as String),
+              selected: selected,
+              selectedColor: const Color(0xFFE5F2F0),
+              checkmarkColor: AppTheme.primary,
+              labelStyle: TextStyle(
+                color: selected ? AppTheme.primary : AppTheme.textPrimary,
+                fontWeight: FontWeight.w600,
+              ),
+              side: BorderSide(
+                color: selected ? AppTheme.primary : AppTheme.border,
+              ),
+              onSelected: (isSelected) {
+                setState(() {
+                  if (isSelected) {
+                    _selectedWeekdays.add(value);
+                  } else {
+                    _selectedWeekdays.remove(value);
+                  }
+                });
+              },
+            );
+          }).toList(),
+        ),
+        if (_selectedWeekdays.isEmpty)
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Text(
+              'Pilih minimal satu hari.',
+              style: TextStyle(fontSize: 13, color: Colors.red.shade700),
+            ),
+          ),
       ],
     );
   }

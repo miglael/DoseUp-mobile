@@ -1,10 +1,8 @@
 import 'package:doseup_project/features/patient/providers/medication_provider.dart';
-import 'package:doseup_project/features/patient/screens/medication_schedule_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/theme/app_theme.dart';
-import '../../../core/widgets/app_bottom_navbar.dart';
 
 //import '../providers/medication_provider.dart';
 import '../widgets/daily_target_card.dart';
@@ -31,7 +29,7 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
   @override
   Widget build(BuildContext context) {
     final medicationProvider = context.watch<MedicationProvider>();
-    final current = medicationProvider.currentMedication;
+    final currentMedication = medicationProvider.currentMedication;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF7F8FE),
@@ -60,18 +58,26 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
 
               const SizedBox(height: 36),
 
-              if (current != null)
+              if (currentMedication != null)
                 NextMedicationCard(
-                  medication: current,
-                  onTaken: () {
-                    medicationProvider.markAsTaken(current.id);
+                  medication: currentMedication,
+                  onTaken: () async {
+                    await medicationProvider.markAsTaken(
+                      currentMedication.scheduleId,
+                    );
+
+                    if (!mounted) return;
+
                     _showMessage('Konfirmasi konsumsi dicatat.');
                   },
-                  onSnooze: () {
-                    medicationProvider.snooze(current.id);
-                    _showMessage(
-                      'Pengingat ditunda. Simulasi ini belum menjalankan timer.',
+                  onSnooze: () async {
+                    await medicationProvider.snooze(
+                      currentMedication.scheduleId,
                     );
+
+                    if (!mounted) return;
+
+                    _showMessage('Pengingat ditunda selama 10 menit.');
                   },
                 )
               else

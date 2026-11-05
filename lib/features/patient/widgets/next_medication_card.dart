@@ -1,10 +1,10 @@
+import 'package:doseup_project/models/medication_schedule_view_model.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_theme.dart';
-import '../../../models/medication_schedule_model.dart';
 
 class NextMedicationCard extends StatelessWidget {
-  final MedicationScheduleModel medication;
+  final MedicationScheduleViewModel medication;
   final VoidCallback onTaken;
   final VoidCallback onSnooze;
 

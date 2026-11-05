@@ -1,10 +1,9 @@
 import 'package:doseup_project/features/patient/screens/add_medication.dart';
+import 'package:doseup_project/models/medication_schedule_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/theme/app_theme.dart';
-import '../../../core/widgets/app_bottom_navbar.dart';
-import '../../../models/medication_schedule_model.dart';
 import '../providers/medication_provider.dart';
 import '../widgets/day_selector.dart';
 import '../widgets/schedule_medication_card.dart';
@@ -18,7 +17,20 @@ class MedicationScheduleScreen extends StatefulWidget {
 }
 
 class _MedicationScheduleScreenState extends State<MedicationScheduleScreen> {
-  int _selectedDay = 3;
+  late DateTime _selectedDate;
+
+  DateTime _getDateForWeekday(int weekday) {
+    final today = DateTime.now();
+
+    // Cari hari Senin pada minggu berjalan.
+    final monday = DateTime(
+      today.year,
+      today.month,
+      today.day,
+    ).subtract(Duration(days: today.weekday - 1));
+
+    return monday.add(Duration(days: weekday - 1));
+  }
 
   void _showMessage(String message) {
     ScaffoldMessenger.of(context)
@@ -29,12 +41,69 @@ class _MedicationScheduleScreenState extends State<MedicationScheduleScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+
+    _selectedDate = DateTime.now();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<MedicationProvider>().loadSchedulesForDate(_selectedDate);
+    });
+  }
+
+  String _monthName(int month) {
+    const months = [
+      'Januari',
+      'Februari',
+      'Maret',
+      'April',
+      'Mei',
+      'Juni',
+      'Juli',
+      'Agustus',
+      'September',
+      'Oktober',
+      'November',
+      'Desember',
+    ];
+
+    return months[month - 1];
+  }
+
+  Future<void> _selectDate() async {
+    final selectedDate = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate,
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2035),
+      helpText: 'Pilih Tanggal',
+      cancelText: 'Batal',
+      confirmText: 'Pilih',
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: Theme.of(context).colorScheme
+                .copyWith(primary: AppTheme.primary),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (selectedDate == null) return;
+
+    setState(() {
+      _selectedDate = selectedDate;
+    });
+
+    await context.read<MedicationProvider>().loadSchedulesForDate(selectedDate);
+  }
+
+  @override
   Widget build(BuildContext context) {
     final provider = context.watch<MedicationProvider>();
 
-    final dailySchedules = provider.schedules
-        .where((item) => item.weekday == _selectedDay)
-        .toList();
+    final dailySchedules = provider.schedules;
 
     final morningSchedules = dailySchedules.where((item) {
       final hour = int.tryParse(item.time.split(':').first) ?? 0;
@@ -61,12 +130,50 @@ class _MedicationScheduleScreenState extends State<MedicationScheduleScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     DaySelector(
-                      selectedDay: _selectedDay,
-                      onChanged: (day) {
+                      selectedDate: _selectedDate,
+                      onChanged: (date) async {
                         setState(() {
-                          _selectedDay = day;
+                          _selectedDate = date;
                         });
+
+                        await context
+                            .read<MedicationProvider>()
+                            .loadSchedulesForDate(date);
                       },
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    InkWell(
+                      onTap: _selectDate,
+                      borderRadius: BorderRadius.circular(8),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 8,
+                          horizontal: 4,
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              '${_selectedDate.day} '
+                              '${_monthName(_selectedDate.month)} '
+                              '${_selectedDate.year}',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppTheme.textSecondary,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            const Icon(
+                              Icons.calendar_month,
+                              size: 20,
+                              color: AppTheme.primary,
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
 
                     const SizedBox(height: 40),
@@ -226,16 +333,18 @@ class _MedicationScheduleScreenState extends State<MedicationScheduleScreen> {
     );
   }
 
-  void _toggleMedication(
+  Future<void> _toggleMedication(
     MedicationProvider provider,
-    MedicationScheduleModel medication,
-  ) {
+    MedicationScheduleViewModel medication,
+  ) async {
     if (medication.status == MedicationStatus.completed) {
-      _showMessage('Obat ini sudah ditandai selesai.');
       return;
     }
 
-    provider.markAsTaken(medication.id);
+    await provider.markAsTaken(medication.scheduleId);
+
+    if (!mounted) return;
+
     _showMessage('Status ${medication.name} berhasil diperbarui.');
   }
 }
